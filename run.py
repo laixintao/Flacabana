@@ -12,8 +12,8 @@ boostrap = Bootstrap(app)
 
 @app.route('/')
 def index():
-    # user_anget = request.headers.get('User-Agent')
-    return render_template('index.html')
+    user_anget = request.headers.get('User-Agent')
+    return render_template('index.html',agent=user_anget)
 
 @app.route('/user/<name>')
 def user(name):
