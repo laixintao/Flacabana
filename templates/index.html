@@ -1,14 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    {% block body %}
-    <title>{% block title %}{% endblock %}</title>
-    {% endblock %}
-</head>
+{% extends "base.html" %}
 
-<body>
-    {% block body %}
-    {% endblock %}
-</body>
-</html>
+{% block page_content %}
+<h1>Hello,Welcome to Flacabana!</h1>
+{% endblock %}

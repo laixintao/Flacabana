@@ -13,7 +13,7 @@ boostrap = Bootstrap(app)
 @app.route('/')
 def index():
     # user_anget = request.headers.get('User-Agent')
-    return "hello"
+    return render_template('index.html')
 
 @app.route('/user/<name>')
 def user(name):
