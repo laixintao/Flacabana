@@ -6,14 +6,18 @@ from flask import make_response
 from flask import redirect
 from flask import render_template
 from flask.ext.bootstrap import Bootstrap
+from flask.ext.moment import Moment
+from datetime import datetime
 
 app = Flask(__name__)
 boostrap = Bootstrap(app)
+moment = Moment(app)
 
 @app.route('/')
 def index():
     user_anget = request.headers.get('User-Agent')
-    return render_template('index.html',agent=user_anget)
+    return render_template('index.html',agent=user_anget,
+                           current_time=datetime.utcnow())
 
 @app.route('/user/<name>')
 def user(name):
