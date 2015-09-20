@@ -8,6 +8,7 @@ from flask import render_template
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
 from datetime import datetime
+from flask import session,url_for
 
 app = Flask(__name__)
 boostrap = Bootstrap(app)
@@ -19,11 +20,11 @@ def index():
     name=None
     form=NameForm()
     if form.validate_on_submit():
-        name=form.name.data
-        form.name.data=''
+        session['name']=form.name.data
+        return redirect(url_for('index'))
     user_anget = request.headers.get('User-Agent')
     return render_template('index.html',agent=user_anget,
-                           current_time=datetime.utcnow(),name=name,form=form)
+                           current_time=datetime.utcnow(),name=session.get('name'),form=form)
 
 @app.route('/user/<name>')
 def user(name):
