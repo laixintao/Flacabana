@@ -9,6 +9,7 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
 from datetime import datetime
 from flask import session,url_for
+from flask import flash
 
 app = Flask(__name__)
 boostrap = Bootstrap(app)
@@ -20,6 +21,9 @@ def index():
     name=None
     form=NameForm()
     if form.validate_on_submit():
+        old_name = session.get('name')
+        if old_name is not None and old_name!=form.name.data:
+            flash('Oh you changed your name!')
         session['name']=form.name.data
         return redirect(url_for('index'))
     user_anget = request.headers.get('User-Agent')
