@@ -12,12 +12,18 @@ from datetime import datetime
 app = Flask(__name__)
 boostrap = Bootstrap(app)
 moment = Moment(app)
+app.config['SECRET_KEY'] = 'readlly hard to guess string.'
 
-@app.route('/')
+@app.route('/',methods=['GET','POST'])
 def index():
+    name=None
+    form=NameForm()
+    if form.validate_on_submit():
+        name=form.name.data
+        form.name.data=''
     user_anget = request.headers.get('User-Agent')
     return render_template('index.html',agent=user_anget,
-                           current_time=datetime.utcnow())
+                           current_time=datetime.utcnow(),name=name,form=form)
 
 @app.route('/user/<name>')
 def user(name):
@@ -30,6 +36,15 @@ def page_not_found(e):
 @app.errorhandler(500)
 def internal_server_error(e):
     return render_template('500.html'),500
+
+# define the form
+from flask.ext.wtf import Form
+from wtforms import StringField,SubmitField
+from wtforms.validators import Required
+
+class NameForm(Form):
+    name=StringField('What is your name?',validators=[Required()])
+    submit = SubmitField('Submit')
 
 if __name__=='__main__':
     app.run(debug=True)
