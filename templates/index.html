@@ -9,6 +9,11 @@
 <br>
 <div class="page-header">
     <h1>Hello,{%if name%}{{name}}{%else%}Stranger{%endif%}</h1>
+    {% if not know %}
+    <p>Pleased to meet you!</p>
+    {% else %}
+    <P>Nice to meet you again!</P>
+    {% endif %}
 </div>
 {{wtf.quick_form(form)}}
 {% endblock %}
