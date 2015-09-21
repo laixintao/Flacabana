@@ -100,3 +100,17 @@ if __name__=='__main__':
     manager.run()
 
 
+# e-mail
+from flask.ext.mail import Message
+from flask.ext.mail import Mail
+
+app.config['FLACABANA_MAIL_SUBJECT_PREFIX'] = '[Flacabana]'
+app.config['FLACABANA_MAL_SENDER'] = 'lai <laixintao1995@163.com>'
+mail = Mail(app)
+
+def send_mail(to,subject,template,**kwargs):
+    msg = Message(app.config['FLACABANA_MAIL_SUBJECT_PREFIX'] + subject,
+                  sender=app.config['FLACABANA_MAL_SENDER'],recipients=[to])
+    msg.body=render_template(template+'.txt',**kwargs)
+    msg.html=render_template(template+'.html',**kwargs)
+    mail.send(msg)
