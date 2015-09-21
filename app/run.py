@@ -15,7 +15,7 @@ from flask.ext.script import Manager
 app = Flask(__name__)
 boostrap = Bootstrap(app)
 moment = Moment(app)
-manager = Manager(app)
+# manager = Manager(app)
 
 app.config['SECRET_KEY'] = 'readlly hard to guess string.'
 
@@ -94,23 +94,9 @@ class NameForm(Form):
 # config flask-migrate
 from flask.ext.migrate import Migrate,MigrateCommand
 migrate = Migrate(app,db)
-manager.add_command('db',MigrateCommand)
+# manager.add_command('db',MigrateCommand)
 
 if __name__=='__main__':
-    manager.run()
+    app.run()
 
 
-# e-mail
-from flask.ext.mail import Message
-from flask.ext.mail import Mail
-
-app.config['FLACABANA_MAIL_SUBJECT_PREFIX'] = '[Flacabana]'
-app.config['FLACABANA_MAL_SENDER'] = 'lai <laixintao1995@163.com>'
-mail = Mail(app)
-
-def send_mail(to,subject,template,**kwargs):
-    msg = Message(app.config['FLACABANA_MAIL_SUBJECT_PREFIX'] + subject,
-                  sender=app.config['FLACABANA_MAL_SENDER'],recipients=[to])
-    msg.body=render_template(template+'.txt',**kwargs)
-    msg.html=render_template(template+'.html',**kwargs)
-    mail.send(msg)
