@@ -20,6 +20,7 @@ def create_app(config_name):
     moment.init_app(app)
     db.init_app(app)
 
-    #todo:route and 404 page
+    from .main import main as main_blueprient
+    app.register_blueprint(main_blueprient)
 
     return app
