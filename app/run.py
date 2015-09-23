@@ -10,13 +10,14 @@ from flask.ext.moment import Moment
 from datetime import datetime
 from flask import session,url_for
 from flask import flash
-from flask.ext.script import Manager
-
 app = Flask(__name__)
 boostrap = Bootstrap(app)
 moment = Moment(app)
+<<<<<<< HEAD:app/run.py
 # manager = Manager(app)
 
+=======
+>>>>>>> parent of 025bcbc... create migrate scripts. NOTE!:run.py
 app.config['SECRET_KEY'] = 'readlly hard to guess string.'
 
 # SQL config
@@ -91,6 +92,7 @@ class NameForm(Form):
     name=StringField('What is your name?',validators=[Required()])
     submit = SubmitField('Submit')
 
+<<<<<<< HEAD:app/run.py
 # config flask-migrate
 from flask.ext.migrate import Migrate,MigrateCommand
 migrate = Migrate(app,db)
@@ -98,5 +100,9 @@ migrate = Migrate(app,db)
 
 if __name__=='__main__':
     app.run()
+=======
+if __name__=='__main__':
+    app.run(debug=True)
+>>>>>>> parent of 025bcbc... create migrate scripts. NOTE!:run.py
 
 
