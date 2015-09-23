@@ -25,6 +25,7 @@ bootstrap = Bootstrap(app)
 moment = Moment(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
+manager.add_command('db',MigrateCommand)
 # mail = Mail(app)
 
 
@@ -73,10 +74,10 @@ def internal_server_error(e):
 def index():
     form = NameForm()
     if form.validate_on_submit():
-        # user = User.query.filter_by(username=form.name.data).first()
-        if True:
+        user = User.query.filter_by(username=form.name.data).first()
+        if user is not None:
             user = User(username=form.name.data)
-            # db.session.add(user)
+            db.session.add(user)
             session['known'] = False
             # if app.config['FLASKY_ADMIN']:
             #     send_email(app.config['FLASKY_ADMIN'], 'New User',
