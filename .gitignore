@@ -1,4 +1,4 @@
 *.py[cod]
 .idea/*
+flask/*
 
-*.pyc
