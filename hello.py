@@ -12,6 +12,7 @@ from wtforms.validators import Required
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate, MigrateCommand
 # from flask.ext.mail import Mail, Message
+from werkzeug.security import generate_password_hash,check_password_hash
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -44,6 +45,19 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
+    password_hash = db.Column(db.String(128))
+
+    @property
+    def password(self):
+        "The password can only be read only"
+        raise AttributeError('password is not a readable attribute!')
+
+    @password.setter
+    def password(self,psw):
+        self.password_hash = generate_password_hash(psw)
+
+    def verify_password(self,psw):
+        return check_password_hash(self.password_hash,password=psw)
 
     def __repr__(self):
         return '<User %r>' % self.username
