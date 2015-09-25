@@ -105,7 +105,7 @@ def index():
         session['name'] = form.name.data
         return redirect(url_for('index'))
     return render_template('index.html', form=form, name=session.get('name'),
-                           known=session.get('known', False))
+                           known=session.get('known', False),username=current_user.username)
 
 # Login
 login_manager = LoginManager(app)
@@ -185,7 +185,7 @@ def user(username):
             return redirect(url_for("user"))
         else:
             flash("Invalid password.")
-    return render_template('user.html',form=form,username = username)
+    return render_template('user.html',form=form,username = str(username))
 
 if __name__ == '__main__':
     manager.run()
