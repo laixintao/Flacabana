@@ -16,7 +16,7 @@ from werkzeug.security import generate_password_hash,check_password_hash
 from flask.ext.login import UserMixin
 from flask.ext.login import LoginManager
 from flask.ext.login import login_required
-from flask.ext.login import login_user,logout_user
+from flask.ext.login import login_user,logout_user,current_user
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -110,7 +110,7 @@ def index():
 # Login
 login_manager = LoginManager(app)
 login_manager.session_protection = "strong"
-login_manager.login_view = 'auth.login'
+login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -164,6 +164,28 @@ def register():
         db.session.commit()
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+#Reset psw
+class ChangePassword(Form):
+    old_password=PasswordField("Old Password",validators=[Required()])
+    password = PasswordField('Password', validators=[Required(),
+                                                     EqualTo('password2', message='Passwords must match.')])
+    password2 = PasswordField('Confirm password', validators=[Required()])
+    submit = SubmitField('Change')
+
+@app.route("/<username>",methods=['GET','POST'])
+def user(username):
+    form = ChangePassword()
+    if form.validate_on_submit():
+        if current_user.verify_password(form.old_password.data):
+            current_user.password = form.password.data
+            db.session.add(current_user)
+            flash("Your password changed !")
+            db.session.commit()
+            return redirect(url_for("user"))
+        else:
+            flash("Invalid password.")
+    return render_template('user.html',form=form,username = username)
 
 if __name__ == '__main__':
     manager.run()
