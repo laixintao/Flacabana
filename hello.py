@@ -105,7 +105,7 @@ def index():
         session['name'] = form.name.data
         return redirect(url_for('index'))
     return render_template('index.html', form=form, name=session.get('name'),
-                           known=session.get('known', False),username=current_user.username)
+                           known=session.get('known', False))
 
 # Login
 login_manager = LoginManager(app)
@@ -143,7 +143,7 @@ def login():
 def logout():
     logout_user()
     flash("You have been logged out.")
-    return redirect(url_for("index"))
+    return redirect(url_for("login"))
 
 class RegistrationForm(Form):
     username = StringField('Username', validators=[
