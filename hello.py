@@ -8,7 +8,7 @@ from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
 from flask.ext.wtf import Form
 from wtforms import StringField, SubmitField,PasswordField,BooleanField
-from wtforms.validators import Required,Length,Email
+from wtforms.validators import Required,Length,Email,EqualTo
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate, MigrateCommand
 # from flask.ext.mail import Mail, Message
@@ -131,10 +131,10 @@ class LoginForm(Form):
 def login():
     form = LoginForm()
     if form.validate_on_submit():
-        user = User.query.filter_by(id=form.id.data).first()
+        user = User.query.filter_by(username=form.id.data).first()
         if user is not None and user.verify_password(form.password.data):
             login_user(user,form.remember_me.data)
-            return redirect(request.args.get('next') or url_for('index'))
+            return redirect(url_for('index'))
         flash('Invalid username or password!')
     return render_template('login.html',form = form)
 
@@ -145,6 +145,25 @@ def logout():
     flash("You have been logged out.")
     return redirect(url_for("index"))
 
+class RegistrationForm(Form):
+    username = StringField('Username', validators=[
+             Required(), Length(1, 64), ])
+    password = PasswordField('Password', validators=[Required(), EqualTo('password2', message='Passwords must match.')])
+    password2 = PasswordField('Confirm password', validators=[Required()])
+    submit = SubmitField('Register')
+
+@app.route("/register",methods=['GET','POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(
+                username=form.username.data,
+                password=form.password.data)
+        db.session.add(user)
+        flash('You can now login.')
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('register.html', form=form)
 
 if __name__ == '__main__':
     manager.run()
