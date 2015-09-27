@@ -1,8 +1,12 @@
 #!flask/bin/python
 
 import os
-from threading import Thread
-from flask import Flask, render_template, session, redirect, url_for,request,flash
+from functools import wraps
+# from threading import Thread
+from flask import Flask, render_template,\
+    session, redirect,\
+    url_for,request,flash,\
+    abort
 from flask.ext.script import Manager, Shell
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
@@ -13,7 +17,7 @@ from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate, MigrateCommand
 # from flask.ext.mail import Mail, Message
 from werkzeug.security import generate_password_hash,check_password_hash
-from flask.ext.login import UserMixin
+from flask.ext.login import UserMixin,AnonymousUserMixin
 from flask.ext.login import LoginManager
 from flask.ext.login import login_required
 from flask.ext.login import login_user,logout_user,current_user
@@ -32,6 +36,19 @@ db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 manager.add_command('db',MigrateCommand)
 # mail = Mail(app)
+
+def permission_required(permission):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args,**kwargs):
+            if not current_user.can(permission):
+                abort(403)
+            return f(*args,**kwargs)
+        return decorated_function
+    return decorator
+
+def admin_required(f):
+    return permission_required(Permission.ADMINISTER)(f)
 
 class Permission:
     FOLLOW = 0x01
@@ -85,6 +102,18 @@ class User(db.Model,UserMixin):
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
 
+    def __init__(self,**kwargs):
+        super(User,self).__init__(**kwargs)
+        if self.role is None:
+            self.role = Role.query.filter_by(default=True).first()
+
+    def can(self,permissions):
+        return self.role is not None and \
+               (self.role.permissions & permissions) == permissions
+
+    def is_administrator(self):
+        return self.can(Permission.ADMINISTER)
+
     @property
     def password(self):
         "The password can only be read only"
@@ -100,6 +129,12 @@ class User(db.Model,UserMixin):
     def __repr__(self):
         return '<User %r>' % self.username
 
+class AnonymousUser(AnonymousUser):
+    def can(self,permissions):
+        return False
+
+    def is_administrator(self):
+        return False
 
 class NameForm(Form):
     name = StringField('What is your name?', validators=[Required()])
