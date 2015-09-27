@@ -129,7 +129,7 @@ class User(db.Model,UserMixin):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class AnonymousUser(AnonymousUser):
+class AnonymousUser(AnonymousUserMixin):
     def can(self,permissions):
         return False
 
@@ -255,6 +255,13 @@ def user(username):
         else:
             flash("Invalid password.")
     return render_template('user.html',form=form,username = str(username))
+
+# Permission test
+@app.route("/admin")
+@login_required
+@admin_required
+def for_admins_only():
+    return "For admin!"
 
 if __name__ == '__main__':
     manager.run()
