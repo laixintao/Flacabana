@@ -7,11 +7,13 @@ from flask import Flask, render_template,\
     session, redirect,\
     url_for,request,flash,\
     abort
+from datetime import datetime
 from flask.ext.script import Manager, Shell
 from flask.ext.bootstrap import Bootstrap
 from flask.ext.moment import Moment
 from flask.ext.wtf import Form
-from wtforms import StringField, SubmitField,PasswordField,BooleanField
+from wtforms import StringField, SubmitField,PasswordField,BooleanField, \
+    IntegerField
 from wtforms.validators import Required,Length,Email,EqualTo
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.migrate import Migrate, MigrateCommand
@@ -21,6 +23,7 @@ from flask.ext.login import UserMixin,AnonymousUserMixin
 from flask.ext.login import LoginManager
 from flask.ext.login import login_required
 from flask.ext.login import login_user,logout_user,current_user
+
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -101,6 +104,9 @@ class User(db.Model,UserMixin):
     username = db.Column(db.String(64), unique=True, index=True)
     role_id = db.Column(db.Integer, db.ForeignKey('roles.id'))
     password_hash = db.Column(db.String(128))
+    truename = db.Column(db.String(32))
+    school_id = db.Column(db.Integer)
+    last_seen = db.Column(db.DateTime(),default=datetime.utcnow())
 
     def __init__(self,**kwargs):
         super(User,self).__init__(**kwargs)
@@ -125,6 +131,11 @@ class User(db.Model,UserMixin):
 
     def verify_password(self,psw):
         return check_password_hash(self.password_hash,password=psw)
+
+    def ping(self):
+        self.last_seen = datetime.utcnow()
+        db.session.add(self)
+        db.session.commit()
 
     def __repr__(self):
         return '<User %r>' % self.username
@@ -159,12 +170,14 @@ def internal_server_error(e):
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
+    if current_user.is_authenticated():
+        current_user.ping()
     form = NameForm()
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.name.data).first()
         if user is not None:
             user = User(username=form.name.data)
-            db.session.add(user)
+            # db.session.add(user)
             session['known'] = False
             # if app.config['FLASKY_ADMIN']:
             #     send_email(app.config['FLASKY_ADMIN'], 'New User',
@@ -219,6 +232,8 @@ class RegistrationForm(Form):
              Required(), Length(1, 64), ])
     password = PasswordField('Password', validators=[Required(), EqualTo('password2', message='Passwords must match.')])
     password2 = PasswordField('Confirm password', validators=[Required()])
+    school_id = IntegerField('Your school id',validators=[Required()])
+    true_name = StringField('Your real name')
     submit = SubmitField('Register')
 
 @app.route("/register",methods=['GET','POST'])
@@ -227,7 +242,10 @@ def register():
     if form.validate_on_submit():
         user = User(
                 username=form.username.data,
-                password=form.password.data)
+                password=form.password.data,
+                truename = form.true_name.data,
+                school_id = form.school_id.data
+        )
         db.session.add(user)
         flash('You can now login.')
         db.session.commit()
