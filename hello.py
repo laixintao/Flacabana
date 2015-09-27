@@ -240,6 +240,10 @@ class RegistrationForm(Form):
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
+        user = User.query.filter_by(username = form.username.data).first()
+        if user is not None:
+            flash("Username has already exist!")
+            return redirect(url_for('register'))
         user = User(
                 username=form.username.data,
                 password=form.password.data,
