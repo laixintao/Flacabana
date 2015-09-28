@@ -162,10 +162,10 @@ manager.add_command('db', MigrateCommand)
 def page_not_found(e):
     return render_template('404.html'), 404
 
-#
-# @app.errorhandler(500)
-# def internal_server_error(e):
-#     return render_template('500.html'), 500
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -230,7 +230,8 @@ def logout():
 class RegistrationForm(Form):
     username = StringField('Username', validators=[
              Required(), Length(1, 64), ])
-    password = PasswordField('Password', validators=[Required(), EqualTo('password2', message='Passwords must match.')])
+    password = PasswordField('Password',
+                             validators=[Required(), EqualTo('password2', message='Passwords must match.')])
     password2 = PasswordField('Confirm password', validators=[Required()])
     school_id = IntegerField('Your school id',validators=[Required()])
     true_name = StringField('Your real name')

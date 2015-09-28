@@ -15,6 +15,6 @@
         School ID:{% if user.school_id %}{{user.school_id}}{%endif%}</p><p>
         Last seen on:{{user.last_seen}}
     </p>
-    <p><a href="{{url_for('change_psw')}}">Change your password</a></p>
+    <p><a class="btn btn-default" href="{{url_for('change_psw')}}">Change your password</a></p>
 </div>
 {% endblock %}
