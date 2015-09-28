@@ -265,24 +265,28 @@ class ChangePassword(Form):
     submit = SubmitField('Change')
 
 @app.route("/user/<username>")
+@login_required
 def user(username):
     user = User.query.filter_by(username=username).first()
     if user is None:
         abort(404)
-    render_template("user.html",user = user)
+    return render_template("user.html",user = user)
 
-
-    # form = ChangePassword()
-    # if form.validate_on_submit():
-    #     if current_user.verify_password(form.old_password.data):
-    #         current_user.password = form.password.data
-    #         db.session.add(current_user)
-    #         flash("Your password changed !")
-    #         db.session.commit()
-    #         return redirect(url_for("user"))
-    #     else:
-    #         flash("Invalid password.")
-    # return render_template('user.html',form=form,username = str(username))
+@app.route("/change_psw",methods=["GET","POST"])
+@login_required
+def change_psw():
+    form = ChangePassword()
+    if form.validate_on_submit():
+        if current_user.verify_password(
+                form.old_password.data):
+            current_user.password = form.password.data
+            db.session.add(current_user)
+            flash("Your password changed !")
+            db.session.commit()
+            return redirect(url_for("user",username=current_user.username))
+        else:
+            flash("Invalid password.")
+    return render_template('change_psw.html',form=form)
 
 # Permission test
 @app.route("/admin")
