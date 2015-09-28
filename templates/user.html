@@ -5,9 +5,16 @@
 
 {% block page_content %}
 <div class="page-header">
-    <h1>User:{{username}}</h1>
+    <h1>User:{{user.username}}</h1>
 </div>
 <div class="col-md-4">
-    {{wtf.quick_form(form)}}
+    <p>
+        {% if user.username %}{{user.username}}{%endif%}
+        Role:{% if user.role_id %}{{user.role_id}}{%endif%}
+        True name:{% if user.truename %}{{user.truename}}{% endif%}
+        School ID:{% if user.school_id %}{{user.school_id}}{%endif%}
+        Last seen on:{{user.last_seen}}
+
+    </p>
 </div>
 {% endblock %}

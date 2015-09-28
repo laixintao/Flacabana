@@ -162,10 +162,10 @@ manager.add_command('db', MigrateCommand)
 def page_not_found(e):
     return render_template('404.html'), 404
 
-
-@app.errorhandler(500)
-def internal_server_error(e):
-    return render_template('500.html'), 500
+#
+# @app.errorhandler(500)
+# def internal_server_error(e):
+#     return render_template('500.html'), 500
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -264,19 +264,25 @@ class ChangePassword(Form):
     password2 = PasswordField('Confirm password', validators=[Required()])
     submit = SubmitField('Change')
 
-@app.route("/<username>",methods=['GET','POST'])
+@app.route("/user/<username>")
 def user(username):
-    form = ChangePassword()
-    if form.validate_on_submit():
-        if current_user.verify_password(form.old_password.data):
-            current_user.password = form.password.data
-            db.session.add(current_user)
-            flash("Your password changed !")
-            db.session.commit()
-            return redirect(url_for("user"))
-        else:
-            flash("Invalid password.")
-    return render_template('user.html',form=form,username = str(username))
+    user = User.query.filter_by(username=username).first()
+    if user is None:
+        abort(404)
+    render_template("user.html",user = user)
+
+
+    # form = ChangePassword()
+    # if form.validate_on_submit():
+    #     if current_user.verify_password(form.old_password.data):
+    #         current_user.password = form.password.data
+    #         db.session.add(current_user)
+    #         flash("Your password changed !")
+    #         db.session.commit()
+    #         return redirect(url_for("user"))
+    #     else:
+    #         flash("Invalid password.")
+    # return render_template('user.html',form=form,username = str(username))
 
 # Permission test
 @app.route("/admin")
