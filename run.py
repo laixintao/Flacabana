@@ -289,6 +289,10 @@ def change_psw():
             flash("Invalid password.")
     return render_template('change_psw.html',form=form)
 
+@app.route("/timetable",methods=["GET","POST"])
+def timetable():
+   return render_template("timetable.html")
+
 # Permission test
 @app.route("/admin")
 @login_required
