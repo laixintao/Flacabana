@@ -140,18 +140,14 @@ class User(db.Model,UserMixin):
     def __repr__(self):
         return '<User %r>' % self.username
 
-class Room(db.Model):
-    __tablename__="rooms"
-    id = db.Column(db.Integer,primary_key=True)
-    room_number = db.Column(db.Integer)
-
 class Post(db.Model):
-    __tablename__ = 'posts'
+    __tablename__ = 'post'
     id = db.Column(db.Integer,primary_key=True)
-    Room = db.Column(db.Integer,db.ForeignKey('rooms.id'))
-    Time = db.Column(db.String(40))
-    available = db.Column(db.Boolean())
-    order_user = db.Column(db.Integer,db.ForeignKey('users.id'))
+    Room
+    Time
+    OutDate
+    available
+    order-user
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self,permissions):
