@@ -143,11 +143,11 @@ class User(db.Model,UserMixin):
 class Post(db.Model):
     __tablename__ = 'post'
     id = db.Column(db.Integer,primary_key=True)
-    Room
-    Time
-    OutDate
-    available
-    order-user
+    # Room
+    # Time
+    # OutDate
+    # available
+    # order-user
 
 class AnonymousUser(AnonymousUserMixin):
     def can(self,permissions):
